@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>Knot AI Studio</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .chat-container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .chat-box { height: 400px; border: 1px solid #ccc; border-radius: 4px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        .input-group { display: flex; }
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .message { margin-bottom: 10px; }
+        .user { text-align: right; color: blue; }
+        .ai { text-align: left; color: green; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Knot AI Studio</h2>
+        <div class="chat-box" id="chatBox"></div>
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Yahan apna sandesh likhein..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">Bhejo</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatBox.innerHTML += <div class="message user"><b>Aap:</b> ${message}</div>;
+            input.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                chatBox.innerHTML += <div class="message ai"><b>AI:</b> ${data.response}</div>;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (err) {
+                chatBox.innerHTML += <div class="message ai" style="color:red;"><b>Error:</b> Server se sampark nahi ho saka.</div>;
+            }
+        }
+    </script>
+</body>
+</html>
